@@ -52,7 +52,15 @@ void init_wifi() {
     s_wifi_event_group = xEventGroupCreate();
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_netif_create_default_wifi_sta();
+
+    esp_netif_t *netif = esp_netif_create_default_wifi_sta();
+//    esp_netif_dhcpc_stop(netif);
+//    esp_netif_ip_info_t ip_info;
+//    IP4_ADDR(&ip_info.ip, 192, 168, 10, 30);
+//    IP4_ADDR(&ip_info.gw, 192, 168, 10, 20);
+//    IP4_ADDR(&ip_info.netmask, 255, 255, 255, 0);
+//    esp_netif_set_ip_info(netif, &ip_info);
+
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT()
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -101,6 +109,10 @@ _Noreturn void read_temp(void *param) {
     float temperature, humidity;
     uint32_t voltage;
 
+    char topic_result[64] = {};
+    strcat(topic_result, "homeassistant/sensor/");
+    strcat(topic_result, CONFIG_AHT21_Device_Name);
+    strcat(topic_result, "/state");
 
     while (true) {
         vTaskDelay(60000 / portTICK_RATE_MS);
@@ -115,7 +127,7 @@ _Noreturn void read_temp(void *param) {
         cJSON_Delete(root);
         printf(json_string);
         if (temperature < 600 && humidity < 1001 && voltage > 1750) {
-            esp_mqtt_client_publish(mqtt_client, Topic, json_string, 0, 1, 0);
+            esp_mqtt_client_publish(mqtt_client, topic_result, json_string, 0, 1, 0);
         }
         cJSON_free(json_string);
 
@@ -127,7 +139,7 @@ void mqtt_init() {
     const esp_mqtt_client_config_t mqtt_config = {.uri=CONFIG_MQTT_BROKER_URL,
             .username=CONFIG_MQTT_USERNAME,
             .password=CONFIG_MQTT_PASSWORD};
-
+    printf("mqtt URI:%s", mqtt_config.uri);
     mqtt_client = esp_mqtt_client_init(&mqtt_config);
     esp_mqtt_client_start(mqtt_client);
 }
