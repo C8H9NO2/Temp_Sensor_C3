@@ -1,0 +1,38 @@
+menu "Device Configuration"
+    config WIFI_SSID
+            string "SSID"
+            default "example-wifi"
+            help
+                SSID of the wireless network
+
+    config WIFI_PASSWORD
+            string "Password"
+            default "default_password"
+            help
+                Password of the wireless network
+
+    config MQTT_BROKER_URL
+            string "MQTT Broker URL"
+            default "mqtt://mqtt.eclipseprojects.io"
+            help
+                URL of the broker to connect to
+
+    config MQTT_USERNAME
+            string "MQTT UserName"
+            default "user"
+            help
+                Set the UserName for login mqtt broker
+
+    config MQTT_PASSWORD
+            string "MQTT Password"
+            default "passwd"
+            help
+                Set the Password for login mqtt broker
+
+    config AHT21_Device_Name
+        string "AHT21 Device Name"
+        default "Room"
+        help
+            Set the Device Name used for mqtt topic and auto detect settings
+
+endmenu
